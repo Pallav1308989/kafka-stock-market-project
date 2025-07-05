@@ -1,0 +1,61 @@
+# kafka-stock-market-project
+
+A Python and Kafka stock market project also includes AWS Glue and AWS Athena, also there are producers and consumers
+
+## Make an EC2 instance and SSH into it through cmd:
+
+wget https://downloads.apache.org/kafka/3.9.1/kafka_2.13-3.9.1.tgz
+tar -xzf kafka_2.13-3.9.1.tgz
+
+sudo yum update -y
+sudo yum install java-11-amazon-corretto-devel -y
+java -version
+This installs Java 11, which is recommended in modern Kafka environments
+
+cd kafka_2.13-3.9.1
+
+## Start Zoo-keeper:
+
+bin/zookeeper-server-start.sh config/zookeeper.properties
+
+Open another window to start kafka
+One cmd has zookeeper and other one has kafka
+SSH into your other cmd as well as done before
+
+Enter in a new console --
+export KAFKA_HEAP_OPTS="-Xmx256M -Xms128M"
+This increases the memory
+
+cd kafka_2.13-3.9.1
+
+The kafka is pointing to private server , change server.properties so that it can run in public IP
+To do this , you can follow any of the 2 steps shared below:
+Do a "sudo nano config/server.properties"
+change ADVERTISED_LISTENERS to public ip of the EC2 instance
+
+bin/kafka-server-start.sh config/server.properties
+
+Also make changes in th security group of the EC2
+Edit inbound rule
+Then All Traffic -> "Anywhere-IPv4" instead of "My IP"
+
+Open third cmd
+Repeat
+
+## Create the topic:
+
+cd kafka_2.13-3.9.1
+bin/kafka-topics.sh --create --topic demo_test --bootstrap-server {Put the Public IP of your EC2 Instance}:9092 --replication-factor 1 --partitions 1
+
+## Start Producer:
+
+bin/kafka-console-producer.sh --topic demo_test --bootstrap-server {Put the Public IP of your EC2 Instance}:9092
+
+## Start Consumer:
+
+Make fourth cmd
+Repeat
+
+Enter in a new console --
+cd kafka_2.13-3.9.1
+bin/kafka-console-consumer.sh --topic demo_test --bootstrap-server {Put the Public IP of your EC2 Instance}:9092
